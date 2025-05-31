@@ -4,7 +4,7 @@ const ingredientList = document.getElementById('ingredient-list')
 options = {
 	method: 'GET',
 	headers: {
-		'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc'
+		'X-RapidAPI-Key': '7b8cbe350bmshb9cd64af44df572p113944jsneb41b6d60cc0'
 	}
 }
 
@@ -37,19 +37,20 @@ console.log(drinkName)
   
 
         //Function used to get an image for our drinks as the API doesnt have a premade image for them!
-    // // function getApiDrinkImage() {
-    // //     fetch(url9, options)
-    // //     .then(response => response.json())
-    // //     .then(function(response){
-    // //         console.log(response)
-    // //         $('<img>', {
-    // //             src: response.value[0].thumbnail
-    // //         }).appendTo('#ingredient-list')
+    function getApiDrinkImage() {
+        fetch(url9, options)
+        .then(response => response.json())
+        .then(function(response){
+            console.log(response)
+            $('<img>', {
+                src: response.value[0].thumbnail
+            }).appendTo('#ingredient-list')
         
-    // //         image = response.value[0].thumbnail
+            image = response.value[0].thumbnail
     
             
-    // })} Used for presentation however images are displaying inappropriate content so I am commenting it out for now and adding a placeholder
+    })} 
+    //Used for presentation however images are displaying inappropriate content so I am commenting it out for now and adding a placeholder
     
 //Function called when user is on a drink related page
 function getApiSingleForDrink() {

@@ -15,275 +15,326 @@ let arrayStatusForDrink = true
 var options = {
 	method: 'GET',
 	headers: {
-		'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc'
+		'X-RapidAPI-Key': '7b8cbe350bmshb9cd64af44df572p113944jsneb41b6d60cc0',
+		'X-RapidAPI-Host': 'the-cocktail-db.p.rapidapi.com'
 	}
 }
-//Defines Variables
 
-
+// Initialize localStorage if undefined
 if (localStorage.searchQuery === undefined) {
 	localStorage.searchQuery = 'food'
 }
 
+// Set placeholder based on search type
 if(localStorage.searchQuery === 'food') {
-	search.setAttribute('placeholder', 'Enter a food (i.e., sandwich, steak, peppers,tacos)')
-} else search.setAttribute('placeholder', 'Enter a drink (i.e., vodka, gin, whiskey)')
-
-// Checks for searchQuery and makes placeholder based on what user is searching for
-
-
-
+	search.setAttribute('placeholder', 'Enter a food (i.e., sandwich, steak, peppers, tacos)')
+} else {
+	search.setAttribute('placeholder', 'Enter a drink (i.e., vodka, gin, whiskey)')
+}
 
 // Function used to change search criteria
 function settingsChecker(e) {
 	e.preventDefault()
 	if(food.checked) {
-		console.log('e')
+		console.log('Food selected')
 		localStorage.searchQuery = 'food'
-		search.setAttribute('placeholder', 'Enter a food (i.e., sandwich, steak, peppers,tacos)')
-		options = {
-			method: 'GET',
-			headers: {
-				'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc',
-			}
-		}
+		search.setAttribute('placeholder', 'Enter a food (i.e., sandwich, steak, peppers, tacos)')
 	}
 
 	if(drink.checked) {
-		console.log('d')
+		console.log('Drink selected')
 		localStorage.searchQuery = 'drink'
 		search.setAttribute('placeholder', 'Enter a drink (i.e., vodka, gin, whiskey)')
-		options = {
-			method: 'GET',
-			headers: {
-				'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc'
-			}
-		}
 	}
-
-	if (localStorage.searchQuery === 'drink') {
-		search.setAttribute('placeholder', 'Enter a drink (i.e., vodka, gin, whiskey')
-	}
-	
 }
 
-
-
+// Event listeners
 $('#save-button').on("click", settingsChecker)
-
 $('#searchButton').on("click", move)
-//Moves user to results page
+
+// Moves user to results page
 function move(e) {
 	e.preventDefault()
 	localStorage.searchResult = search.value
 
 	if (localStorage.searchQuery === 'food') {
-
 		window.location.assign('assets/html/loader.html') 
-		
-		//  block of code to be executed if the condition is true
-	  } if(localStorage.searchQuery === 'drink') {
-
+	} else if(localStorage.searchQuery === 'drink') {
 		window.location.assign('assets/html/loader2.html') 
-		//  block of code to be executed if the condition is false
-	  }
-
-	
-	
-
+	}
 }
+
 // Function called in results.js to call the Api Fetch
-	function fetchApi(){
-	
-		if (localStorage.searchQuery === 'drink') {
-			url = `https://cocktails3.p.rapidapi.com/search/byname/${localStorage.searchResult}`
-	
-			getDrinks()
-	
-		} else
+function fetchApi(){
+	if (localStorage.searchQuery === 'drink') {
+		url = `https://the-cocktail-db.p.rapidapi.com/search.php?s=${localStorage.searchResult}`
+		getDrinks()
+	} else {
 		url = `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=${localStorage.searchResult}&type=main course&addRecipeInformation=true&fillIngredients=true`
 		getFood()
-	
-	
+	}
 }
 
-
-//Function getDrinks
+// Function getDrinks
 function getDrinks() {
 	fetch(url, options)
 	.then(response => response.json())
 	.then(function(response){
-		console.log(response)
-		let ingredient;
-		var i = 0
-		//Displaying data on page
-		for(var z = 0; z < response.body[0].length; z++) {
+		console.log('Drinks search response:', response)
+		
+		// The Cocktail DB returns drinks in the 'drinks' property
+		let drinks = response.drinks || [];
+		
+		if (drinks.length === 0) {
+			console.error('No drinks found')
+			$('#api-content').html('<p>No drinks found. Try a different search term.</p>')
+			return
+		}
+		
+		console.log('Found drinks:', drinks.length)
+		
+		// Clear previous results
+		$('#api-content').empty();
+		
+		// Display drinks data
+		for(var z = 0; z < Math.min(drinks.length, 10); z++) {
+			const drink = drinks[z];
+			const drinkName = drink.strDrink || 'Unknown Drink';
+			const drinkId = drink.idDrink;
+			
+			// Create link container
 			$('<a>', {
-				href: './single.html?=drink=' + response.body[0][z].name + '=' + z,
-				id: z + 'a'
+				href: './single.html?type=drink&name=' + encodeURIComponent(drinkName) + '&id=' + drinkId,
+				id: z + 'a',
+				class: 'drink-item'
 			}).appendTo('#api-content')
+			
+			// Create drink container
 			$('<div>', {
-				id: z
+				id: 'drink-' + z,
+				class: 'drink-container'
 			}).appendTo('#' + z + 'a')
+			
+			// Add drink name
 			$('<h2>',{
-				id: response.body[0][z].name
-			}).appendTo('#' + z).text(response.body[0][z].name)
+				class: 'drink-name'
+			}).appendTo('#drink-' + z).text(drinkName)
 			
-			$('<div>', {
-				id: 'ingredientList' + z
-			}).appendTo("#"+z)
+			// Create ingredients list container
+			$('<ul>', {
+				id: 'ingredientList' + z,
+				class: 'ingredient-list'
+			}).appendTo("#drink-" + z)
 
-			console.log(response.body[0][0].ingredients.length)
-
-			for(var index = 0; index < response.body[0][z].ingredients.length; index++) {
-				$('<li>').appendTo('#ingredientList'+z).text(response.body[0][z].ingredients[index])
+			// Extract ingredients from strIngredient1, strIngredient2, etc.
+			let ingredients = [];
+			for(let i = 1; i <= 15; i++) {
+				const ingredient = drink[`strIngredient${i}`];
+				const measure = drink[`strMeasure${i}`];
+				if (ingredient && ingredient.trim()) {
+					const fullIngredient = measure && measure.trim() ? `${measure.trim()} ${ingredient.trim()}` : ingredient.trim();
+					ingredients.push(ingredient.trim()); // Store just the ingredient name for searching
+					$('<li>').appendTo('#ingredientList' + z).text(fullIngredient)
+				}
 			}
-
-		loopArray()
-			// LoopArray and get FoodByIngeredients is an algorithm used to traverse each array allowing the api's to talk to eachother and find mutual ingredients and list the products on the screen in single.js
-		function loopArray() {
-		ingredient = response.body[0][0].ingredients[i]
-		newUrl = `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?includeIngredients=${ingredient}&type=main course&addRecipeInformation=true`
-		if(arrayStatusForFood == true) {
-			getFoodByIngredients(newUrl, options)
-		}
-		
-
 			
-	}
-//function getFoodByIngredients
-	function getFoodByIngredients(newUrl,options) {
-		fetch(newUrl, options)
-		.then(response => response.json())
-		.then(function(response) {
-			
-			
-			if(response.results.length === 0) {
-				i++
-				console.log('h')
-				arrayStatusForFood = true
-				loopArray(i)
-				
-			} else
-			arrayStatusForFood = false
-			loopArray(i)
-			
-			
-	
-		}
-	)}
-		options = {
-			method: 'GET',
-			headers: {
-				'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc'
+			if (ingredients.length === 0) {
+				$('<li>').appendTo('#ingredientList' + z).text('No ingredients listed')
 			}
 		}
 		
+		// Start the food pairing search with the first drink
+		if (drinks.length > 0) {
+			const firstDrink = drinks[0];
+			let ingredients = [];
+			
+			// Extract ingredients for food pairing
+			for(let i = 1; i <= 15; i++) {
+				const ingredient = firstDrink[`strIngredient${i}`];
+				if (ingredient && ingredient.trim()) {
+					ingredients.push(ingredient.trim());
+				}
+			}
+			
+			if (ingredients.length > 0) {
+				loopArray(0, ingredients)
+			}
+		}
 		
-    }
-})
-
+		// Function to find food pairings based on drink ingredients
+		function loopArray(index, ingredients) {
+			if (index >= ingredients.length) {
+				console.log('Finished searching for food pairings')
+				return
+			}
+			
+			const ingredient = ingredients[index]
+			const newUrl = `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?includeIngredients=${encodeURIComponent(ingredient)}&type=main course&addRecipeInformation=true`
+			
+			// Use different headers for Spoonacular API
+			const foodOptions = {
+				method: 'GET',
+				headers: {
+					'X-RapidAPI-Key': '7b8cbe350bmshb9cd64af44df572p113944jsneb41b6d60cc0',
+					'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
+				}
+			}
+			
+			if(arrayStatusForFood === true) {
+				getFoodByIngredients(newUrl, foodOptions, index, ingredients)
+			}
+		}
+		
+		// Function getFoodByIngredients
+		function getFoodByIngredients(newUrl, foodOptions, currentIndex, ingredients) {
+			fetch(newUrl, foodOptions)
+			.then(response => response.json())
+			.then(function(response) {
+				if(response.results && response.results.length === 0) {
+					console.log('No food found for ingredient: ' + ingredients[currentIndex])
+					// Try next ingredient
+					loopArray(currentIndex + 1, ingredients)
+				} else if (response.results && response.results.length > 0) {
+					console.log('Found food pairings:', response.results)
+					arrayStatusForFood = false
+					// You can add code here to display the food pairings
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching food by ingredients:', error)
+				loopArray(currentIndex + 1, ingredients)
+			})
+		}
+	})
+	.catch(error => {
+		console.error('Error fetching drinks:', error)
+		$('#api-content').html('<p>Error searching for drinks. Please try again.</p>')
+	})
 }
-//The same thing as get drinks but for the food side
+
+// Function getFood
 function getFood() {
-	fetch(url, options)
+	// Use proper headers for Spoonacular API
+	const foodOptions = {
+		method: 'GET',
+		headers: {
+			'X-RapidAPI-Key': '7b8cbe350bmshb9cd64af44df572p113944jsneb41b6d60cc0',
+			'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
+		}
+	}
+	
+	fetch(url, foodOptions)
 	.then(response => response.json())
 	.then(function(response){
 		console.log(url)
 		console.log(response)
+		
+		// Check if response has valid data
+		if (!response.results || response.results.length === 0) {
+			console.error('No food found')
+			return
+		}
+		
 		let ingredient;
-		var i = 0
+		var i = 0;
 
-		loopArrayD()
-
+		// Display food data
 		for(var z = 0; z < response.results.length; z++) {
-			console.log(arrayStatusForDrink)
-			
+			// Create link container
 			$('<a>', {
-				href: './single.html?=food=' + response.results[z].title + '=' + response.results[z].id,
-
-				id: z + 'a'
+				href: './single.html?type=food&name=' + encodeURIComponent(response.results[z].title) + '&id=' + response.results[z].id,
+				id: z + 'a',
+				class: 'food-item'
 			}).appendTo('#api-content')
+			
+			// Create food container
 			$('<div>', {
-				id: z
+				id: 'food-' + z,
+				class: 'food-container'
 			}).appendTo('#' + z + 'a')
+			
+			// Add food name
 			$('<h2>',{
-				id: response.results[z].title
-			}).appendTo('#' + z).text(response.results[z].title )
+				class: 'food-name'
+			}).appendTo('#food-' + z).text(response.results[z].title)
 			
-			$('<div>', {
-				id: 'ingredientList' + z
-			}).appendTo("#"+z)
+			// Create ingredients list container
+			$('<ul>', {
+				id: 'ingredientList' + z,
+				class: 'ingredient-list'
+			}).appendTo("#food-" + z)
 			
-			console.log(response.results[z].extendedIngredients.length)
-			for(var index = 0; index < response.results[z].extendedIngredients.length; index++) {
-				$('<li>').appendTo('#ingredientList'+z).text(response.results[z].extendedIngredients[index].original)
-			}
-			
-
-	
-
-	}
-		
-	
-		function loopArrayD() {
-		
-		ingredient = response.results[0].extendedIngredients[i].name
-		newUrl = `https://cocktails3.p.rapidapi.com/search/byingredient/${ingredient}`
-		if(arrayStatusForDrink === true) {
-			getDrinksByIngredients(newUrl, options)
-		}
-		
-		console.log(response.results.length)
-
-		
-
-		
-	}
-
-	function getDrinksByIngredients(newUrl,options) {
-		fetch(newUrl, options)
-		.then(response => response.json())
-		.then(function(response) {
-			
-			console.log(response.body[0].length)
-			if(response.body[0].length === 0) {
-				i++
-				console.log('h')
-				loopArrayD(i)
-				
-			} else if(response.body[0].length > 0)
-			console.log(response)
-			arrayStatusForDrink = false
-				
-	
-		}
-	)}
-		options = {
-			method: 'GET',
-			headers: {
-				'X-RapidAPI-Key': 'c36c798c41msh6e4944725bbf051p1c3342jsn7e587c0ecbdc'
+			// Add ingredients if available
+			if (response.results[z].extendedIngredients) {
+				for(var index = 0; index < response.results[z].extendedIngredients.length; index++) {
+					$('<li>').appendTo('#ingredientList' + z).text(response.results[z].extendedIngredients[index].original)
+				}
 			}
 		}
 		
+		// Start the drink pairing search
+		if (response.results.length > 0 && response.results[0].extendedIngredients && response.results[0].extendedIngredients.length > 0) {
+			loopArrayD(0)
+		}
 		
-    })
+		// Function to find drink pairings based on food ingredients
+		function loopArrayD(index) {
+			if (!response.results[0].extendedIngredients || index >= response.results[0].extendedIngredients.length) {
+				console.log('Finished searching for drink pairings')
+				return
+			}
+			
+			ingredient = response.results[0].extendedIngredients[index].name
+			newUrl = `https://the-cocktail-db.p.rapidapi.com/filter.php?i=${encodeURIComponent(ingredient)}`
+			
+			if(arrayStatusForDrink === true) {
+				getDrinksByIngredients(newUrl, options, index)
+			}
+		}
 
-
+		// Function getDrinksByIngredients
+		function getDrinksByIngredients(newUrl, options, currentIndex) {
+			fetch(newUrl, options)
+			.then(response => response.json())
+			.then(function(response) {
+				if(!response.drinks || response.drinks.length === 0) {
+					console.log('No drinks found for ingredient: ' + response.results[0].extendedIngredients[currentIndex].name)
+					// Try next ingredient
+					loopArrayD(currentIndex + 1)
+				} else {
+					console.log('Found drink pairings:', response.drinks)
+					arrayStatusForDrink = false
+					// You can add code here to display the drink pairings
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching drinks by ingredients:', error)
+				loopArrayD(currentIndex + 1)
+			})
+		}
+	})
+	.catch(error => {
+		console.error('Error fetching food:', error)
+	})
 }
 
-
-
-iconButton.addEventListener("click", opendevs)
+// Modal functions
+if (iconButton) {
+	iconButton.addEventListener("click", opendevs)
+}
 
 function opendevs() {
-	hideclass.classList.remove("hideclass")
-
+	if (hideclass) {
+		hideclass.classList.remove("hideclass")
+	}
 }
 
-closebutton.addEventListener("click", closedevs)
+if (closebutton) {
+	closebutton.addEventListener("click", closedevs)
+}
 
 function closedevs() {
-	hideclass.classList.add("hideclass")
-
+	if (hideclass) {
+		hideclass.classList.add("hideclass")
+	}
 }

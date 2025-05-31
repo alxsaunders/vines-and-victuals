@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
     <!-- Owl Carousel optional css but required for default nav controls like dots or next buttons  -->
@@ -31,103 +33,96 @@
     <title>Vines and Victuals</title>
 </head>
 <body>
-<div id="preloader"> <section>
-            <div class=" mealLoad loading loading02">
-              <span>G</span>
-              <span>E</span>
-              <span>N</span>
-              <span>E</span>
-              <span>R</span>
-              <span>A</span>
-              <span>T</span>
-              <span>I</span>
-              <span>N</span>
-              <span>G</span>
-              <span><br></span> 
-              <span><br></span> 
-              <span><br></span> 
-              <span><br></span> 
-              <span>Y</span>
-              <span>O</span>
-              <span>U</span>
-              <span>R</span>
-              <span><br></span> 
-              <span><br></span> 
-              <span><br></span> 
-              <span><br></span> 
-              <span>M</span>
-              <span>E</span>
-              <span>A</span>
-              <span>L</span>
+<div id="preloader"> 
+    <section>
+        <div class="mealLoad loading loading02">
+            <span>G</span>
+            <span>E</span>
+            <span>N</span>
+            <span>E</span>
+            <span>R</span>
+            <span>A</span>
+            <span>T</span>
+            <span>I</span>
+            <span>N</span>
+            <span>G</span>
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>Y</span>
+            <span>O</span>
+            <span>U</span>
+            <span>R</span>
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>&nbsp;</span> 
+            <span>M</span>
+            <span>E</span>
+            <span>A</span>
+            <span>L</span>
+        </div>
+    </section>
+    <span class="loadicon"></span>
+</div>
+
+  
+<header>
+    <figure class="image">
+        <div class="titletext">
+            <img id="goldBorder" src="../images/logoduo.png" alt="Vines and Victuals Logo">
+        </div>
+        <a href="../../index.html">
+            <div class="homeicon">
+                <i class="fa fa-home fa-3x" style="color:#D2A63E"></i>
             </div>
-           </section>
-          <span class="loadicon"></span>
-    
-      </div>
-
-  
-  <header>
-    <figure class="image ">
-      <div class="titletext">
-      <img id="goldBorder" src="../images/logoduo.png">
-    </div>
-    <a href="../../index.html"><div class="homeicon">
-      <i class="fa fa-home fa-3x" style="color:#D2A63E"></i>
-      </div></a>
-      <a href="save.html"><div class="bookicon">
-      <i class="fas fa-bookmark fa-3x" style="color:#D2A63E"></i>
-      </div></a>
+        </a>
+        <a href="save.html">
+            <div class="bookicon">
+                <i class="fas fa-bookmark fa-3x" style="color:#D2A63E"></i>
+            </div>
+        </a>
     </figure>
-
-  </header>
+</header>
   
 
-  <div class="headerOne">
-    <h1  id="title"></h1><div class="" id="save-result">
-      <i class="fas fa-bookmark fa-3x"  style="color:#D2A63E"></i>
-      </div>
-  
-      
-
-      
-    <div id="ingredient-list"></div>
-    <ol id="instructions">
-      <h2>Instructions!</h2>
-    </ol>
-  </div>
-  
-
-  
-  <h1 id="relato">Perfect Matches!</h1>
-  <div id="related-food">
-
+<div class="headerOne">
+    <h1 id="title"></h1>
+    <div class="" id="save-result">
+        <i class="fas fa-bookmark fa-3x" style="color:#D2A63E"></i>
+    </div>
     
-  </div>
+    <div id="ingredient-list"></div>
+    
+    <div id="instructions">
+        <h2>Instructions</h2>
+        <ol id="instructions-list"></ol>
+    </div>
+</div>
+  
+<h1 id="relato">Perfect Matches!</h1>
+<div id="related-food"></div>
 
-
-
-
-  <figure class="image ">
+<figure class="image">
     <div class="footertext">
-    <img id="goldBorder" src="../images/footerBorder.png">
-  </div>
+        <img id="goldBorder" src="../images/footerBorder.png" alt="Footer Border">
+    </div>
 </figure>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-    <script src="../js/single.js"></script>
-    <script>
-      var loader = document.getElementById("preloader");
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script src="../js/single.js"></script>
+<script>
+    var loader = document.getElementById("preloader");
 
-     
-      window.addEventListener("load", setTimeout(showdata, 6000))
-      
+    // Fixed the setTimeout usage
+    window.addEventListener("load", function() {
+        setTimeout(showdata, 6000);
+    });
 
-
-      function showdata() {
-        loader.style.display  = "none"
-      }
-       
-
-    </script>
+    function showdata() {
+        loader.style.display = "none";
+    }
+</script>
 </body>
-</html> 
+</html>
